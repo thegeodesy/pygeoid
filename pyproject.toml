@@ -7,7 +7,7 @@ name = "pygeoid"
 dynamic = ["version"]
 description = "Python toolkit for physical geodesy"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [{ name = "Ilya Oshchepkov" }]
 keywords = ["geodesy", "gravimetry", "gravity", "geoid"]
