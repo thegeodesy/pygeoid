@@ -157,13 +157,13 @@ class Position:
         """Return local east-north-up Cartesian coordinates."""
         return transform.ecef_to_enu(self.x, self.y, self.z, origin, ell=ell)
 
-    def transform_to(self, frame):
-        """Transform this position to a local tangent plane."""
-        from pygeoid.geometry.frame import LocalTangentPlane
+    def transform_to(self, coordinate_system):
+        """Transform this position to a local coordinate system."""
+        from pygeoid.geometry.coordinates.local import LocalTangentPlane
 
-        if isinstance(frame, LocalTangentPlane):
-            return frame.from_position(self)
-        raise TypeError(f"Unsupported target frame: {frame!r}")
+        if isinstance(coordinate_system, LocalTangentPlane):
+            return coordinate_system.from_position(self)
+        raise TypeError(f"Unsupported target coordinate system: {coordinate_system!r}")
 
     def represent_as(self, coordinates):
         """Return coordinates in a supported coordinate system.

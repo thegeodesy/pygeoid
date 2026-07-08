@@ -3,13 +3,14 @@
 import numpy as np
 
 from pygeoid.conventions import units as u
-from pygeoid.geometry.coordinates import CartesianCoordinates, transform
+from pygeoid.geometry.coordinates import transform
+from pygeoid.geometry.coordinates.cartesian import CartesianCoordinates
 
-__all__ = ["LocalFrame", "LocalTangentPlane"]
+__all__ = ["LocalCoordinates", "LocalTangentPlane"]
 
 
-class LocalFrame:
-    """Arbitrary local Cartesian frame."""
+class LocalCoordinates:
+    """Arbitrary local Cartesian coordinates."""
 
     def __init__(self, coordinates, y=None, z=None):
         if isinstance(coordinates, CartesianCoordinates):
@@ -41,8 +42,8 @@ class LocalFrame:
         return np.broadcast_shapes(np.shape(self.x), np.shape(self.y), np.shape(self.z))
 
 
-class LocalTangentPlane(LocalFrame):
-    """Local Cartesian frame tangent to an Earth position."""
+class LocalTangentPlane(LocalCoordinates):
+    """Local Cartesian coordinate system tangent to an Earth position."""
 
     def __init__(self, coordinates=None, *, origin, orientation=("E", "N", "U")):
         self._origin = origin
@@ -79,7 +80,7 @@ class LocalTangentPlane(LocalFrame):
         try:
             azimuth, altitude = azalt[direction]
         except KeyError as exc:
-            raise ValueError(f"Invalid frame orientation `{name}`") from exc
+            raise ValueError(f"Invalid coordinate system orientation `{name}`") from exc
 
         azimuth *= u.deg
         altitude *= u.deg
@@ -97,7 +98,7 @@ class LocalTangentPlane(LocalFrame):
         return local @ ecef_to_enu
 
     def from_position(self, position):
-        """Return this frame containing ``position`` in local coordinates."""
+        """Return this coordinate system containing ``position`` in local coordinates."""
         delta = u.Quantity(
             [
                 position.x - self.origin.x,
@@ -125,13 +126,13 @@ class LocalTangentPlane(LocalFrame):
             ell=self.origin.ellipsoid,
         )
 
-    def transform_to(self, frame):
+    def transform_to(self, coordinate_system):
         """Transform to another local tangent plane or to ``Position``."""
         from pygeoid.geometry.position import Position
 
         position = self.to_position()
-        if frame is Position:
+        if coordinate_system is Position:
             return position
-        if isinstance(frame, LocalTangentPlane):
-            return frame.from_position(position)
-        raise TypeError(f"Unsupported target frame: {frame!r}")
+        if isinstance(coordinate_system, LocalTangentPlane):
+            return coordinate_system.from_position(position)
+        raise TypeError(f"Unsupported target coordinate system: {coordinate_system!r}")

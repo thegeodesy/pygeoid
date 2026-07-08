@@ -10,6 +10,8 @@ from .coordinates import (
     EllipsoidalCoordinates,
     EllipsoidalHarmonicCoordinates,
     GeodeticCoordinates,
+    LocalCoordinates,
+    LocalTangentPlane,
     SphericalCoordinates,
 )
 from .position import Position
@@ -21,5 +23,7 @@ __all__ = [
     "SphericalCoordinates",
     "GeodeticCoordinates",
     "EllipsoidalHarmonicCoordinates",
+    "LocalCoordinates",
+    "LocalTangentPlane",
     "Position",
 ]

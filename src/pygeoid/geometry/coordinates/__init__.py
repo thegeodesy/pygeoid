@@ -7,6 +7,7 @@ from .ellipsoidal import (
     EllipsoidalHarmonicCoordinates,
     GeodeticCoordinates,
 )
+from .local import LocalCoordinates, LocalTangentPlane
 from .spherical import SphericalCoordinates
 
 __all__ = [
@@ -16,4 +17,6 @@ __all__ = [
     "SphericalCoordinates",
     "GeodeticCoordinates",
     "EllipsoidalHarmonicCoordinates",
+    "LocalCoordinates",
+    "LocalTangentPlane",
 ]

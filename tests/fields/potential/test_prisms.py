@@ -2,7 +2,7 @@ import astropy.units as u
 import numpy as np
 import pytest
 
-from pygeoid.geometry.frame import LocalFrame
+from pygeoid.geometry.coordinates.local import LocalCoordinates
 from pygeoid.fields.potential import prisms
 
 bounds = u.Quantity(np.float64([0, 100, 0, 100, 0, 100]), u.m)
@@ -13,9 +13,9 @@ p = prisms.Prism(bounds, density=density)
 def test_bounds():
 
     with pytest.raises(ValueError):
-        p.gxx(LocalFrame(50 * u.m, 50 * u.m, 50 * u.m))
+        p.gxx(LocalCoordinates(50 * u.m, 50 * u.m, 50 * u.m))
     with pytest.raises(ValueError):
-        p.gxx(LocalFrame(100 * u.m, 100 * u.m, 0 * u.m))
+        p.gxx(LocalCoordinates(100 * u.m, 100 * u.m, 0 * u.m))
 
 
 def test_gxx_gyy_gzz():
@@ -32,7 +32,7 @@ def test_gxx_gyy_gzz():
 
     xx, yy, zz = np.meshgrid(x, y, z) * u.m
 
-    cart = LocalFrame(xx, yy, zz)
+    cart = LocalCoordinates(xx, yy, zz)
 
     gxx = p.gxx(cart).value
     gyy = p.gyy(cart).value
@@ -48,7 +48,7 @@ def test_gxx_gyy_gzz():
 
 
 def test_hessian_uses_all_off_diagonal_terms():
-    cart = LocalFrame(150 * u.m, 275 * u.m, 425 * u.m)
+    cart = LocalCoordinates(150 * u.m, 275 * u.m, 425 * u.m)
 
     hessian = p.hessian(cart).value
 

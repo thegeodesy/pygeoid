@@ -9,7 +9,7 @@ from pygeoid.geometry.coordinates import (
     SphericalCoordinates,
 )
 from pygeoid.geometry.surfaces import DEFAULT_ELLIPSOID, Ellipsoid
-from pygeoid.geometry.frame import LocalTangentPlane
+from pygeoid.geometry.coordinates.local import LocalTangentPlane
 from pygeoid.geometry.coordinates.transform import ecef_to_enu, enu_to_ecef
 
 ell = Ellipsoid("GRS80")
@@ -104,7 +104,7 @@ def test_from_to_ellipsoidal_default_ellipsoid():
     np.testing.assert_allclose(cartesian_values(b_p), cartesian_values(p))
 
 
-def test_represent_as_preserves_frame_ellipsoid():
+def test_represent_as_preserves_coordinate_system_ellipsoid():
     ell1 = Ellipsoid("GRS80")
     ell2 = Ellipsoid("intl")
 

@@ -9,7 +9,7 @@ from astropy.coordinates import CartesianDifferential
 from pygeoid.conventions import units as u
 from pygeoid.conventions.constants import G
 from pygeoid.fields.potential.base import PotentialBase as _PotentialBase
-from pygeoid.geometry.frame import LocalFrame
+from pygeoid.geometry.coordinates.local import LocalCoordinates
 
 __all__ = ["Prism", "PrismBounds"]
 
@@ -42,7 +42,7 @@ def _limits_sum(function):
         total_sum = 0
         for index in itertools.product([1, 2], [3, 4], [5, 6], repeat=1):
             index = np.asarray(index)
-            coords = LocalFrame(bounds[index - 1])
+            coords = LocalCoordinates(bounds[index - 1])
             total_sum += (-1) ** (index.sum()) * function(self, coords)
         return total_sum * G * self._density
 
@@ -103,7 +103,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)
@@ -151,7 +151,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)
@@ -169,7 +169,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)
@@ -187,7 +187,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)
@@ -205,7 +205,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)
@@ -219,7 +219,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)
@@ -233,7 +233,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)
@@ -247,7 +247,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)
@@ -261,7 +261,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)
@@ -275,7 +275,7 @@ class Prism(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.LocalFrame
+        position : ~pygeoid.geometry.LocalCoordinates
             Cartesian coordinates of the attracted point.
         """
         x, y, z, r = self._prepare_coords(position)

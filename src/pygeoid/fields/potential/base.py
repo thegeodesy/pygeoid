@@ -61,7 +61,7 @@ class PotentialBase(ScalarField, metaclass=abc.ABCMeta):
         Parameters
         ----------
         position : subclass of BaseCoordinateFrame or BaseRepresentation
-            Coordinate frame instance.
+            Coordinate system or representation instance.
 
         Returns
         -------
@@ -81,7 +81,7 @@ class PotentialBase(ScalarField, metaclass=abc.ABCMeta):
         Parameters
         ----------
         position : subclass of BaseCoordinateFrame or BaseRepresentation
-            Coordinate frame instance.
+            Coordinate system or representation instance.
         differential_class : subclass of `~astropy.coordinates.BaseDifferential`,
         optional
             Class in which the differentials should be represented.
@@ -109,7 +109,7 @@ class PotentialBase(ScalarField, metaclass=abc.ABCMeta):
         Parameters
         ----------
         position : subclass of BaseCoordinateFrame or BaseRepresentation
-            Coordinate frame instance.
+            Coordinate system or representation instance.
 
         """
         differential = self.differential(position, *args, **kwargs)
