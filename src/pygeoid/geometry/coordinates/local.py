@@ -98,7 +98,7 @@ class LocalTangentPlane(LocalCoordinates):
         return local @ ecef_to_enu
 
     def from_position(self, position):
-        """Return this coordinate system containing ``position`` in local coordinates."""
+        """Return this system containing ``position`` in local coordinates."""
         delta = u.Quantity(
             [
                 position.x - self.origin.x,
