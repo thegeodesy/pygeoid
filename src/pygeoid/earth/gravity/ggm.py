@@ -174,7 +174,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -206,7 +206,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -245,7 +245,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -266,7 +266,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -286,7 +286,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -311,7 +311,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -338,7 +338,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -362,7 +362,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -375,7 +375,7 @@ class GlobalGravityFieldModel:
         coeffs = self._anomalous._coeffs.coeffs
         lmax = self._anomalous._coeffs.lmax
         _, _, degrees, cosin, x, q = _expand.common_precompute(
-            sph.lat, sph.lon, sph.distance, self._coeffs.r0, lmax
+            sph.lat, sph.lon, sph.radius, self._coeffs.r0, lmax
         )
 
         args = (
@@ -389,7 +389,7 @@ class GlobalGravityFieldModel:
 
         values = _expand.expand_parallel(x, q, *args)
 
-        ri = 1 / sph.distance
+        ri = 1 / sph.radius
         out = self._coeffs.gm * ri**2 * values
 
         return _np.squeeze(out)
@@ -407,7 +407,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
         ref_pot : ~pygeoid.conventions.units.Quantity
             Reference potential value W0 for the zero degree term. Defaut is
@@ -441,7 +441,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -473,14 +473,14 @@ class GlobalGravityFieldModel:
 
         gamma = self._ell.normal_gravity(ellharm.rlat, ellharm.u_ax)
 
-        denom_eta = gamma * sph.distance * _np.cos(sph.lat)
+        denom_eta = gamma * sph.radius * _np.cos(sph.lat)
         eta = -(dapot_lon / denom_eta) * u.rad
 
         nu = geod.lat - sph.lat
         cnu = _np.cos(nu)
         snu = _np.sin(nu)
 
-        xi = -(cnu * dapot_lat / sph.distance - snu * dapot_rad) / gamma * u.rad
+        xi = -(cnu * dapot_lat / sph.radius - snu * dapot_rad) / gamma * u.rad
 
         return _np.sqrt(eta**2 + xi**2)
 
@@ -494,7 +494,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -523,7 +523,7 @@ class GlobalGravityFieldModel:
 
         gamma = self._ell.normal_gravity(ellharm.rlat, ellharm.u_ax)
 
-        denom = gamma * sph.distance * _np.cos(sph.lat)
+        denom = gamma * sph.radius * _np.cos(sph.lat)
         eta = (-dapot_lon / denom) * u.rad
 
         return eta
@@ -538,7 +538,7 @@ class GlobalGravityFieldModel:
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -573,7 +573,7 @@ class GlobalGravityFieldModel:
         cnu = _np.cos(nu)
         snu = _np.sin(nu)
 
-        xi = -(cnu * dapot_lat / sph.distance - snu * dapot_rad) / gamma * u.rad
+        xi = -(cnu * dapot_lat / sph.radius - snu * dapot_rad) / gamma * u.rad
 
         return xi
 
@@ -610,7 +610,7 @@ class SHGravPotential(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -622,7 +622,7 @@ class SHGravPotential(_PotentialBase):
         sph = position.represent_as("spherical")
 
         _, _, degrees, cosin, x, q = _expand.common_precompute(
-            sph.lat, sph.lon, sph.distance, self._coeffs.r0, self._coeffs.lmax
+            sph.lat, sph.lon, sph.radius, self._coeffs.r0, self._coeffs.lmax
         )
         args = (
             _expand.in_coeff_potential,
@@ -635,7 +635,7 @@ class SHGravPotential(_PotentialBase):
 
         values = _expand.expand_parallel(x, q, *args)
 
-        ri = 1 / sph.distance
+        ri = 1 / sph.radius
 
         out = _np.squeeze(self._coeffs.gm * ri * values)
 
@@ -647,9 +647,9 @@ class SHGravPotential(_PotentialBase):
     def _derivative(self, position, variable):
         sph = position.represent_as("spherical")
         lat, _, degrees, cosin, x, q = _expand.common_precompute(
-            sph.lat, sph.lon, sph.distance, self._coeffs.r0, self._coeffs.lmax
+            sph.lat, sph.lon, sph.radius, self._coeffs.r0, self._coeffs.lmax
         )
-        ri = 1 / sph.distance
+        ri = 1 / sph.radius
 
         if variable in ("lat", "latitude"):
             args = (
@@ -695,7 +695,7 @@ class SHGravPotential(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -716,7 +716,7 @@ class SHGravPotential(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -729,7 +729,7 @@ class SHGravPotential(_PotentialBase):
             centr_d_lat = self.centrifugal.differential(
                 position, SphericalDifferential
             ).d_lat
-            out += centr_d_lat * position.spherical.distance**2 / u.rad
+            out += centr_d_lat * position.spherical.radius**2 / u.rad
         return out
 
     @u.quantity_input
@@ -738,7 +738,7 @@ class SHGravPotential(_PotentialBase):
 
         Parameters
         ----------
-        position : ~pygeoid.geometry.frame.ECEF
+        position : ~pygeoid.geometry.Position
             Position in the Earth-Centered-Earth-Fixed frame.
 
         Returns
@@ -753,7 +753,7 @@ class SHGravPotential(_PotentialBase):
             ).d_lon
             scale = (
                 u.rad
-                / (position.spherical.distance * _np.cos(position.spherical.lat)) ** 2
+                / (position.spherical.radius * _np.cos(position.spherical.lat)) ** 2
             )
             out += centr_d_lon / scale
 
@@ -763,7 +763,7 @@ class SHGravPotential(_PotentialBase):
         sph = position.represent_as("spherical")
 
         lat, _, degrees, cosin, x, q = _expand.common_precompute(
-            sph.lat, sph.lon, sph.distance, self._coeffs.r0, self._coeffs.lmax
+            sph.lat, sph.lon, sph.radius, self._coeffs.r0, self._coeffs.lmax
         )
 
         m_coeff = _np.tile(degrees, (self._coeffs.lmax + 1, 1))
@@ -779,7 +779,7 @@ class SHGravPotential(_PotentialBase):
 
         values = _expand.expand_parallel(x, q, *args)
 
-        ri = 1 / sph.distance
+        ri = 1 / sph.radius
         gmri = self._coeffs.gm * ri
         clat = _np.cos(lat)
 
@@ -788,8 +788,8 @@ class SHGravPotential(_PotentialBase):
         rad_d = -self._coeffs.gm * ri**2 * values[:, :, 2]
 
         out = SphericalDifferential(
-            d_lon=lon_d / (sph.distance * _np.cos(sph.lat)) ** 2 * u.rad,
-            d_lat=lat_d / sph.distance**2 * u.rad,
+            d_lon=lon_d / (sph.radius * _np.cos(sph.lat)) ** 2 * u.rad,
+            d_lat=lat_d / sph.radius**2 * u.rad,
             d_distance=rad_d,
         )
 

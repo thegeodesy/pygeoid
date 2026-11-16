@@ -1,58 +1,181 @@
-"""Geometry of the reference ellipsoid."""
+"""Geometry of reference ellipsoids."""
+
+import functools as _functools
 
 import numpy as _np
 import pyproj as _proj
 
 from pygeoid.conventions import units as u
+from pygeoid.geometry.surfaces.base import Surface
 
 # default ellipsoid for geometrical (geodetic) applications
 DEFAULT_ELLIPSOID = "GRS80"
 
+_GEOD_LENGTH_PARAMETERS = {"a", "b"}
+_GEOD_DIMENSIONLESS_PARAMETERS = {"e", "f", "rf", "es"}
 
-class Ellipsoid:
-    """Class represents an ellipsoid of revolution and its geometry.
 
-    This class uses proj.Geod class from pyproj package, so any valid init
-    string for Proj are accepted as arguments. See `pyproj.Geod.__new__`
-    documentation (https://pyproj4.github.io/pyproj/stable/api/geod.html)
-    for more information.
+def get_ellps_map():
+    """Return pyproj ellipsoid definitions with unit-aware parameters.
+
+    This wraps `pyproj.get_ellps_map` and returns a new dictionary where
+    semi-axis parameters are quantities in metres and flattening parameters are
+    dimensionless quantities. Descriptions are preserved as strings.
+    """
+    return {
+        ellps: {
+            key: _ellipsoid_parameter_with_units(key, value)
+            for key, value in params.items()
+        }
+        for ellps, params in _proj.get_ellps_map().items()
+    }
+
+
+def _ellipsoid_parameter_with_units(key, value):
+    if key in _GEOD_LENGTH_PARAMETERS:
+        return value * u.m
+    if key in _GEOD_DIMENSIONLESS_PARAMETERS:
+        return value * u.dimensionless_unscaled
+    return value
+
+
+class Ellipsoid(Surface):
+    """Ellipsoid of revolution and its geometric properties.
+
+    This class wraps `pyproj.Geod` for geodesic calculations and exposes
+    common ellipsoid parameters and derived geometric quantities as unit-aware
+    properties.
+
+    Named ellipsoids can be selected with ``ellps``. If no name or custom
+    parameters are given, the default named ellipsoid is ``GRS80``. ``None``
+    and ``"default"`` also select ``GRS80``.
+
+    Custom ellipsoids can be created with keyword parameters accepted by
+    `pyproj.Geod`, but unlike `pyproj.Geod`, numeric custom values must be
+    quantities with proper units. Length parameters such as ``a`` and ``b`` are
+    converted to metres; dimensionless parameters such as ``f``, ``rf``, ``e`` and
+    ``es`` are converted to plain dimensionless values.
+
+    Use `get_ellps_map` to get PyProj's named ellipsoid definitions with units
+    attached to numeric parameters. Those definitions can be passed directly to
+    this constructor with ``Ellipsoid(**params)``.
 
     Parameters
     ----------
-    ellps : str, optional
-        Ellipsoid name, most common ellipsoids are accepted.
-        Default is 'GRS80'.
+    ellps : str or None, optional
+        Named ellipsoid understood by `pyproj.Geod`.
+    **kwargs
+        Custom ellipsoid parameters with units accepted by `pyproj.Geod`,
+        including definitions returned by `get_ellps_map`.
     """
 
-    def __init__(self, ellps: "str" = None, **kwargs):
-        if not kwargs:
-            if ellps in _proj.pj_ellps:
-                kwargs["ellps"] = ellps
-            elif ellps is None or ellps.lower() == "default":
-                kwargs["ellps"] = DEFAULT_ELLIPSOID
-            else:
-                raise ValueError(
-                    f"No ellipsoid with name {ellps}, possible values \
-                        are:\n{_proj.pj_ellps.keys()}"
-                )
-        # else:
-        # TODO: Check if all parameters are in SI units
-        #    pass
+    def __init__(self, ellps: str | None = None, **kwargs):
+        if kwargs:
+            kwargs = self._geod_kwargs_from_quantities(kwargs)
+            if ellps is not None:
+                kwargs["ellps"] = self._ellipsoid_name(ellps)
+        else:
+            kwargs["ellps"] = self._ellipsoid_name(ellps)
 
-        # define useful short-named attributes
-        self.geod = _proj.Geod(**kwargs)
-        self.a = self.geod.a * u.m
-        self.b = self.geod.b * u.m
-        # flattening
-        self.f = self.geod.f * u.dimensionless_unscaled
-        # eccentricity squared
-        self.e2 = _np.float64(self.geod.es) * u.dimensionless_unscaled
-        # eccentricity
-        self.e = _np.sqrt(self.e2) * u.dimensionless_unscaled
-        # 2nd eccentricity squared
-        self.e12 = self.e2 / (1 - self.e2) * u.dimensionless_unscaled
-        # 2nd eccentricity
-        self.e1 = _np.sqrt(self.e12) * u.dimensionless_unscaled
+        self._geod = _proj.Geod(**kwargs)
+
+    @classmethod
+    def from_pyproj_crs(cls, crs):
+        """Create an ellipsoid from a pyproj-compatible CRS definition.
+
+        Parameters
+        ----------
+        crs
+            Any input accepted by `pyproj.CRS.from_user_input`, such as an EPSG
+            code, authority string, WKT, PROJ string, or `pyproj.CRS` instance.
+
+        Returns
+        -------
+        Ellipsoid
+            Ellipsoid initialized from the CRS geodesic definition.
+        """
+        self = cls.__new__(cls)
+        self._geod = _proj.CRS.from_user_input(crs).get_geod()
+        return self
+
+    @property
+    def geod(self):
+        """Read-only `pyproj.Geod` backend."""
+        return self._geod
+
+    def to_proj_geod(self):
+        """Return a `pyproj.Geod` initialized from the original parameters."""
+        return _proj.Geod(self.geod.initstring)
+
+    @staticmethod
+    def _ellipsoid_name(ellps):
+        if ellps in _proj.pj_ellps:
+            return ellps
+        if ellps is None or ellps.lower() == "default":
+            return DEFAULT_ELLIPSOID
+        raise ValueError(
+            f"No ellipsoid with name {ellps}, possible values \
+                are:\n{_proj.pj_ellps.keys()}"
+        )
+
+    @staticmethod
+    def _geod_kwargs_from_quantities(kwargs):
+        geod_kwargs = {}
+        for key, value in kwargs.items():
+            if key == "description":
+                geod_kwargs[key] = value
+                continue
+
+            if not isinstance(value, u.Quantity):
+                raise TypeError(f"`{key}` must be a quantity with units.")
+
+            if key in _GEOD_LENGTH_PARAMETERS:
+                if not value.unit.is_equivalent(u.m):
+                    raise u.UnitTypeError(f"`{key}` must have length units.")
+                geod_kwargs[key] = value.to(u.m).value
+            elif key in _GEOD_DIMENSIONLESS_PARAMETERS:
+                if not value.unit.is_equivalent(u.dimensionless_unscaled):
+                    raise u.UnitTypeError(f"`{key}` must be dimensionless.")
+                geod_kwargs[key] = value.to(u.dimensionless_unscaled).value
+            else:
+                geod_kwargs[key] = value.si.value
+
+        return geod_kwargs
+
+    @_functools.cached_property
+    def a(self):
+        """Return semi-major or equatorial axis radius, in metres."""
+        return self.geod.a * u.m
+
+    @_functools.cached_property
+    def b(self):
+        """Return semi-minor or polar axis radius, in metres."""
+        return self.geod.b * u.m
+
+    @_functools.cached_property
+    def f(self):
+        """Return flattening of the ellipsoid."""
+        return self.geod.f * u.dimensionless_unscaled
+
+    @_functools.cached_property
+    def e2(self):
+        """Return first eccentricity squared."""
+        return _np.float64(self.geod.es) * u.dimensionless_unscaled
+
+    @_functools.cached_property
+    def e(self):
+        """Return first eccentricity."""
+        return _np.sqrt(self.e2) * u.dimensionless_unscaled
+
+    @_functools.cached_property
+    def e12(self):
+        """Return second eccentricity squared."""
+        return self.e2 / (1 - self.e2) * u.dimensionless_unscaled
+
+    @_functools.cached_property
+    def e1(self):
+        """Return second eccentricity."""
+        return _np.sqrt(self.e12) * u.dimensionless_unscaled
 
     @property
     def equatorial_radius(self):
@@ -255,7 +378,7 @@ class Ellipsoid:
         -----
         The arithmetic mean radius of the ellipsoid is
 
-        .. math:: R_m = \frac{2a + b}{2},
+        .. math:: R_m = \frac{2a + b}{3},
 
         where :math:`a` and :math:`b` are equatorial and polar axis of the
         ellipsoid respectively.
@@ -268,7 +391,7 @@ class Ellipsoid:
 
         A sphere with the same volume as the ellipsoid has the radius
 
-        .. math:: R_V = a^2 b.
+        .. math:: R_V = \sqrt[3]{a^2 b}.
 
         """
         if kind == "arithmetic":
@@ -395,6 +518,14 @@ class Ellipsoid:
         return self.polar_curvature_radius / self._v(lat)
 
     @u.quantity_input
+    def _principal_curvature_radii(self, lat: u.deg):
+        """Return both meridian and prime vertical curvature radii."""
+        return (
+            self.meridian_curvature_radius(lat),
+            self.prime_vertical_curvature_radius(lat),
+        )
+
+    @u.quantity_input
     def mean_curvature(self, lat: u.deg) -> 1 / u.m:
         r"""Return mean curvature, in inverse metres.
 
@@ -414,13 +545,12 @@ class Ellipsoid:
         :math:`M` -- radius of curvature of meridian normal section,
         :math:`N` -- radius of curvature of prime vertical.
         """
-        meridian_curv_radius = self.meridian_curvature_radius(lat)
-        pvertical_curv_radius = self.prime_vertical_curvature_radius(lat)
-        return 1 / _np.sqrt(meridian_curv_radius * pvertical_curv_radius)
+        m_rad, n_rad = self._principal_curvature_radii(lat)
+        return 1 / _np.sqrt(m_rad * n_rad)
 
     @u.quantity_input
-    def gaussian_curvature(self, lat: u.deg) -> 1 / u.m:
-        """Return Gaussian curvature, in inverse metres.
+    def gaussian_curvature(self, lat: u.deg) -> 1 / u.m**2:
+        """Return Gaussian curvature, in inverse squared metres.
 
         Parameters
         ----------
@@ -430,7 +560,7 @@ class Ellipsoid:
         Returns
         -------
         ~pygeoid.conventions.units.Quantity
-            Value of the Gaussian radius of curvature.
+            Value of the Gaussian curvature.
 
         Notes
         -----
@@ -438,9 +568,8 @@ class Ellipsoid:
         :math:`M` -- radius of curvature of meridian normal section,
         :math:`N` -- radius of curvature of prime vertical.
         """
-        meridian_curv_radius = self.meridian_curvature_radius(lat)
-        pvertical_curv_radius = self.prime_vertical_curvature_radius(lat)
-        return _np.sqrt(meridian_curv_radius * pvertical_curv_radius)
+        m_rad, n_rad = self._principal_curvature_radii(lat)
+        return 1 / (m_rad * n_rad)
 
     @u.quantity_input
     def average_curvature(self, lat: u.deg) -> 1 / u.m:
@@ -466,10 +595,8 @@ class Ellipsoid:
         :math:`N` -- radius of curvature of prime vertical.
 
         """
-        return 0.5 * (
-            1 / self.prime_vertical_curvature_radius(lat)
-            + 1 / self.meridian_curvature_radius(lat)
-        )
+        m_rad, n_rad = self._principal_curvature_radii(lat)
+        return 0.5 * (1 / m_rad + 1 / n_rad)
 
     #########################################################################
     # Arc distances, geodetic problems

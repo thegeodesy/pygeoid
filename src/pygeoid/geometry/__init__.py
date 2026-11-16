@@ -4,4 +4,26 @@ This subpackage contains classes and functions for coordinate objects and
 transformations frequently used in physical geodesy.
 """
 
-__all__ = []
+from .coordinates import (
+    BaseCoordinates,
+    CartesianCoordinates,
+    EllipsoidalCoordinates,
+    EllipsoidalHarmonicCoordinates,
+    GeodeticCoordinates,
+    LocalCoordinates,
+    LocalTangentPlane,
+    SphericalCoordinates,
+)
+from .position import Position
+
+__all__ = [
+    "BaseCoordinates",
+    "EllipsoidalCoordinates",
+    "CartesianCoordinates",
+    "SphericalCoordinates",
+    "GeodeticCoordinates",
+    "EllipsoidalHarmonicCoordinates",
+    "LocalCoordinates",
+    "LocalTangentPlane",
+    "Position",
+]
