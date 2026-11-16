@@ -52,6 +52,12 @@ docs = [
     "jupyter"
 ]
 
+[project.urls]
+Homepage = "https://github.com/thegeodesy/pygeoid"
+Documentation = "https://pygeoid.thegeodesy.com"
+Issues = "https://github.com/thegeodesy/pygeoid/issues"
+Source = "https://github.com/thegeodesy/pygeoid"
+
 [tool.setuptools]
 include-package-data = true
 package-dir = {"" = "src"}

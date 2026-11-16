@@ -18,5 +18,5 @@ Installing the latest development version
 You can use ``pip`` to install the latest version of the source code from
 GitHub::
 
-    python -m pip install --upgrade git+https://github.com/ioshchepkov/pygeoid
+    python -m pip install --upgrade git+https://github.com/thegeodesy/pygeoid
 

@@ -16,7 +16,7 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.4692429
     description: This DOI represents all versions.
-repository-code: 'https://github.com/ioshchepkov/pygeoid'
+repository-code: 'https://github.com/thegeodesy/pygeoid'
 url: 'https://pygeoid.thegeodesy.com'
 abstract: >-
   Gravity field modelling and computational geodesy in
