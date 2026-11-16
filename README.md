@@ -23,8 +23,8 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://github.com/ioshchepkov/pygeoid/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/ioshchepkov/pygeoid/ci.yml?branch=master"
+  <a href="https://github.com/thegeodesy/pygeoid/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/thegeodesy/pygeoid/ci.yml?branch=master"
       alt="CI">
   </a>
   <a href="https://coveralls.io/github/ioshchepkov/pygeoid">
@@ -41,8 +41,8 @@
     <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4692429.svg"
       alt="DOI">
   </a>
-  <a href="https://github.com/ioshchepkov/pygeoid/blob/develop/LICENSE.txt">
-    <img src="https://img.shields.io/github/license/ioshchepkov/pygeoid"
+  <a href="https://github.com/thegeodesy/pygeoid/blob/develop/LICENSE.txt">
+    <img src="https://img.shields.io/github/license/thegeodesy/pygeoid"
       alt="License">
   </a>
 </p>
@@ -68,7 +68,7 @@ pip install pygeoid
 Install development version:
 
 ```bash
-pip install -U git+https://github.com/ioshchepkov/pygeoid@develop
+pip install -U git+https://github.com/thegeodesy/pygeoid@develop
 ```
 
 # Documentation
