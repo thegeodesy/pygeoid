@@ -8,4 +8,6 @@ development practices, and decisions that shape how the codebase evolves.
 .. toctree::
    :maxdepth: 2
 
+   development.rst
+   releasing.rst
    architecture.rst

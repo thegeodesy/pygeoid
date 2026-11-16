@@ -1,0 +1,24 @@
+{
+  "title": "PyGeoid",
+  "upload_type": "software",
+  "description": "Gravity field modelling and computational geodesy in Python.",
+  "creators": [
+    {
+      "name": "Oshchepkov, Ilya",
+      "orcid": "0000-0002-1883-7242"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "geodesy",
+    "gravimetry",
+    "gravity"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/thegeodesy/pygeoid",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}

@@ -24,15 +24,15 @@
 </p>
 <p align="center">
   <a href="https://github.com/thegeodesy/pygeoid/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/thegeodesy/pygeoid/ci.yml?branch=master"
+    <img src="https://img.shields.io/github/actions/workflow/status/thegeodesy/pygeoid/ci.yml?branch=main"
       alt="CI">
   </a>
-  <a href="https://coveralls.io/github/ioshchepkov/pygeoid">
-    <img src="https://coveralls.io/repos/github/ioshchepkov/pygeoid/badge.svg"
+  <a href="https://coveralls.io/github/thegeodesy/pygeoid">
+    <img src="https://coveralls.io/repos/github/thegeodesy/pygeoid/badge.svg"
       alt="Tests coverage">
   </a>
   <a href="https://pygeoid.thegeodesy.com">
-    <img src="https://app.readthedocs.org/projects/pygeoid/badge/?version=master"
+    <img src="https://app.readthedocs.org/projects/pygeoid/badge/?version=latest"
       alt="Documentation Status">
   </a>
 </p>
@@ -41,7 +41,7 @@
     <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4692429.svg"
       alt="DOI">
   </a>
-  <a href="https://github.com/thegeodesy/pygeoid/blob/develop/LICENSE.txt">
+  <a href="https://github.com/thegeodesy/pygeoid/blob/main/LICENSE.txt">
     <img src="https://img.shields.io/github/license/thegeodesy/pygeoid"
       alt="License">
   </a>
@@ -62,13 +62,13 @@ APIs may and will change between minor versions.
 Install from `PyPI`:
 
 ```bash
-pip install pygeoid
+python -m pip install pygeoid
 ```
 
-Install development version:
+Install the development version (Python 3.12 or newer):
 
 ```bash
-pip install -U git+https://github.com/thegeodesy/pygeoid@develop
+python -m pip install -U "git+https://github.com/thegeodesy/pygeoid@main"
 ```
 
 # Documentation
