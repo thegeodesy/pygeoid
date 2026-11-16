@@ -9,7 +9,7 @@ build:
     - libopenblas-dev
     - pkg-config
   tools:
-    python: "3.15"
+    python: "3.14"
 
 sphinx:
   configuration: docs/conf.py

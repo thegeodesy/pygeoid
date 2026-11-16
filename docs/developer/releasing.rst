@@ -63,6 +63,10 @@ first automated publication.
 Read the Docs setup
 -------------------
 
+Hosted documentation and the docs CI job use Python 3.14, which Read the Docs
+supports. Development and package testing also use Python 3.15. Keeping the
+hosted interpreter separate does not constrain runtime dependency upgrades.
+
 In the existing project settings:
 
 * Set repository URL to ``https://github.com/thegeodesy/pygeoid.git``.
